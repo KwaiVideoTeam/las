@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <title>Las Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 12px;
+        }
+
+        video {
+            background: #000000;
+            display: block;
+        }
+
+        #errorCode {
+            color: red;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .bitrate {
+            margin-left: 10px;
+            margin-right: 5px;
+        }
+
+        .baseBlock {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        #monitor {
+            width: 800px;
+            color: #011935;
+        }
+
+        #base {
+            font-size: 8px;
+            background-color: #EEEEEE;
+        }
+
+        #details {
+            display: flex;
+            flex-wrap: wrap;
+            /* background-color: #011935; */
+        }
+
+        #details span {
+            margin: 5px;
+            border-bottom: solid 1px #CCC;
+            min-width: 90px;
+        }
+    </style>
+    <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
+</head>
+
+<body>
+    <div class="ui-widget baseBlock" style="display: flex; width: 800px; justify-content: space-between">
+        <img src="./logo.png" height="50" />
+        <textarea id="manifestInput" placeholder="请输入：manifest地址 / manifest内容" class="ui-widget ui-corner-all"
+            style="flex-grow:1; margin-right: 5px;" rows="3"></textarea>
+        <span style="display: inline-flex;flex-direction: column;">
+            <button onclick="play(manifestInput.value);" class="ui-button ui-widget ui-corner-all play-btn "
+                style="color: #fff;background-color: #337ab7;border-color: #2e6da4;width: 80px;vertical-align: top;">播放</button>
+            <span id="time" style="text-align: end; margin: 5px;"></span>
+        </span>
+    </div>
+    <label id="errorCode"></label>
+    <section id="container" class="baseBlock">
+        <video id="player" controls="controls" width="800px" height="480px" autoplay muted></video>
+    </section>
+    <div id="progress" class="baseBlock" style="margin-top: 0"></div>
+    <div id="monitor" class="baseBlock" style="margin-top: 0;">
+        <div id="base"></div>
+        <div id="details"></div>
+    </div>
+    <div id="levels" class="widget baseBlock">
+        <h2>Current Level</h2>
+        <div id="currentLevels"></div>
+        <h2>Next Level</h2>
+        <div id="nextLevels"></div>
+    </div>
+    <div class="baseBlock" hidden>
+        <h2>debug</h2>
+        <button onclick="deleteLas()" class="ui-button ui-widget ui-corner-all">删除</button>
+        <button onclick="rebuild()" class="ui-button ui-widget ui-corner-all">删除重新创建</button>
+    </div>
+    <div id="pageUrl" class="baseBlock"></div>
+    <div class="baseBlock">
+        <button onclick="getSummary()" class="ui-button ui-widget ui-corner-all">汇总数据</button>
+        <pre id="summary">
+        </pre>
+    </div>
+</body>
+<script src="/index.js"></script>
+<script src="lib/moment.min.js"></script>
+<script src="lib/url-parse.js"></script>
+<script src="lib/jquery/jquery-3.3.1.min.js"></script>
+<script src="lib/jquery/jquery-ui.min.js"></script>
+<script src="tools.js"></script>
+<script type="text/javascript">
+    var player = document.querySelector('#player');
+    var manifestInput = document.querySelector('#manifestInput');
+    var errorCode = document.querySelector('#errorCode');
+    var bufferedBar = new LasTools.BufferedBarClass();
+    bufferedBar.attachMedia(player);
+
+    var base = document.querySelector('#base');
+    var details = document.querySelector('#details');
+    var summary = document.querySelector('#summary');
+
+    setInterval(function () {
+        bufferedBar.refresh();
+        document.getElementById('time').innerHTML = moment().format("HH:mm:ss.SSS");
+    }, 100);
+    $("#progress").append(bufferedBar.dom);
+
+    var las = null;
+    var config = {};
+    var avgBitrate = 0;
+    var avgBuffered = 0;
+    var avgTimes = 0;
+
+    var levelSwitchingCount = 0;
+    var startTime = 0;
+
+    function start(src) {
+        avgBitrate = 0;
+        avgBuffered = 0;
+        avgTimes = 0;
+
+        levelSwitchingCount = 0;
+        startTime = performance.now();
+
+        if (!las) {
+            las = new Las({
+                debug: 'i'
+            });
+            las.attachMedia(player);
+            las.on('mediaInfo', function (d) {
+                base.innerHTML = parseMediaInfo(d);
+            });
+            las.on('heartbeat', function (value) {
+                let bufferedLen = buffered();
+                var times = avgTimes + 1;
+                avgBitrate = (avgBitrate * avgTimes + value.videoDataRate + value.audioDataRate) / times;
+                avgBuffered = (avgBuffered * avgTimes + bufferedLen) / times;
+                avgTimes = times;
+                var data = las.monitorData;
+                var waitingCnt = 0;
+                details.innerHTML = '<span>速度:' + sizeFormat(value.speed * 8) + 'b/s</span><span>已下载:'
+                    + sizeFormat(value.totalReceive) + 'b</span><span>缓冲:' + bufferedLen.toFixed(3) + 's</span><span>码率v:'
+                    + value.videoDataRate + 'kbps</span><span>码率a:' + value.audioDataRate + 'kbps</span><span>fps解码:'
+                    + value.decodedFPS + '</span><span>fps丢帧:' + value.droppedFPS + '</span><span>解码帧数:'
+                    + value.decodedFrames + '</span><span>丢帧数:' + value.droppedFPS + '</span><span>卡顿次数:'
+                    + data.blockCount + '</span><span>卡顿时长:' + Math.round(data.blockDuration) + '</span><span>平均码率:'
+                    + avgBitrate.toFixed(0) + 'kbps</span><span>平均缓冲:' + avgBuffered.toFixed(3) + '</span><span>切换次数:'
+                    + levelSwitchingCount + '</span><span>播放时长:' + Math.round(performance.now() - startTime) + 'ms</span>';
+            });
+
+            las.on('loadEnd', function () {
+                console.log('loadEnd');
+            });
+            las.on('scriptParsed', function (e) {
+                console.log('scriptParsed', e);
+            });
+            las.on('lasError', function (e) {
+                errorCode.innerHTML = `${e.details}-${e.info.reason}`;
+                console.log('错误：', e);
+            });
+            las.on('levelSwitching', function (msg) {
+                console.log('levelSwitching', msg, las.currentLevel, las.nextLevel);
+                levelSwitchingCount++;
+                refreshLevelsStat(msg.level);
+            });
+            las.on('levelSwitchFailed', function (msg) {
+                console.log('levelSwitchFailed', msg);
+            });
+            las.on('levelSwitched', function (msg) {
+                console.log('levelSwitched', msg, las.currentLevel, las.nextLevel);
+                refreshLevelsStat(las.nextLevel, msg.level);
+            });
+            las.on('manifestParsed', function (msg) {
+                console.log('manifestParsed', msg);
+                refreshLevels(msg.levels);
+            });
+            las.on("levelUpdated", function (msg) {
+                console.log('levelUpdated', msg);
+            });
+            las.load(src);
+        } else {
+            las.load(src);
+        }
+    }
+
+    function getSummary() {
+        var data = las.monitorData;
+        summary.innerHTML = `播放时长: ${Math.round(performance.now() - startTime)}ms
+卡顿次数: ${data.blockCount}
+卡顿时长: ${data.blockDuration}
+切换次数: ${levelSwitchingCount}
+平均码率: ${Math.round(avgBitrate)}kbps
+平均延迟: ${Math.round(avgBuffered * 1000) / 1000}s`
+    }
+
+    function handleToggle(e) {
+        var target = $(e.target);
+        var arr = target[0].id.split('_');
+        id = parseInt(arr[1], 10);
+        if (arr[0] === 'next') {
+            las.nextLevel = id;
+        } else {
+            las.currentLevel = id;
+        }
+    }
+
+    function refreshLevels(levels) {
+        $("#currentLevels").children().remove();
+        $("#nextLevels").children().remove();
+
+        $("#currentLevels").append($(`<label for="current_-1">自动</label><input type="radio" class="levelRadio" name="current" id="current_-1">`));
+        $("#nextLevels").append($(`<label for="next_-1">自动</label><input type="radio" class="levelRadio" name="next" id="next_-1">`));
+
+        for (var i = 0; i < levels.length; i++) {
+            var label = $(`<label for="current_${i}">${levels[i].qualityTypeName}|${levels[i].bitrate}</label>`);
+            var input = $(`<input type="radio" class="levelRadio" name="current" id="current_${i}">`);
+            $("#currentLevels").append(label, input);
+            var nLabel = $(`<label for="next_${i}">${levels[i].qualityTypeName}|${levels[i].bitrate}</label>`);
+            var nInput = $(`<input type="radio" class="levelRadio" name="next" id="next_${i}">`);
+            $("#nextLevels").append(nLabel, nInput);
+        }
+
+        $(".levelRadio").checkboxradio({
+            icon: false
+        }).on("click", handleToggle);
+
+        refreshLevelsStat(las.nextLevel, las.currentLevel);
+    }
+
+    function refreshLevelsStat(next, current) {
+        $(`#next_${next}`).prop("checked", true);
+        if (typeof current === 'number') {
+            $(`#current_${current}`).prop("checked", true);
+        }
+        $(".levelRadio").checkboxradio("refresh")
+    }
+
+    function play(src) {
+        pageUrl(src);
+
+        manifestInput.value = src;
+        errorCode.innerHTML = '';
+
+        $("#radio").prop('hidden', true);
+        var manifest = src;
+        try {
+            manifest = JSON.parse(src);
+        } catch (e) { };
+        if (typeof manifest === 'string') {
+            loadManifest(src, start);
+        } else {
+            start(src);
+        }
+    }
+
+    function pageUrl(src) {
+        var u = new URLParse(location.href, true);
+        u.query.u = src;
+        $("#pageUrl").empty();
+        $("#pageUrl").append('<a href="' + u.toString() + '">' + u.toString() + '</a>');
+    }
+
+    function destroyLas() {
+        if (las) {
+            las.removeAllListeners();
+            las.destroy();
+            las = undefined;
+        }
+    }
+
+    function rebuild() {
+        destroyLas();
+        init();
+    }
+
+    function deleteLas() {
+        if (las) {
+            las.stopLoad();
+            destroyLas();
+        }
+    }
+
+    function loadManifest(url, cb) {
+        try {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.onload = function (e) {
+                try {
+                    e.response
+                    console.log('debug onload');
+                    cb(JSON.parse(xhr.response));
+                } catch (e) { }
+            };
+            xhr.onreadystatechange = function (e) {
+                if (xhr.status < 200 || xhr.status > 299) {
+                    errorCode.innerHTML = `发生错误：manifest加载失败:${xhr.status}`;
+                    this._onError(new Error('xhr error'));
+                }
+            }
+            xhr.onerror = function (e) {
+                errorCode.innerHTML = `发生错误：manifest加载失败:${xhr.status}`;
+            }
+            xhr.send();
+        } catch (e) {
+            console.e(e);
+        }
+    }
+
+    function init() {
+        manifestInput.onkeydown = function (e) {
+            if (e.keyCode === 13 && manifestInput.focus) {
+                play(manifestInput.value);
+            }
+        };
+        manifestInput.focus();
+        var u = new URLParse(location.href, true);
+        if (u.query.u) {
+            manifestInput.value = u.query.u;
+            play(manifestInput.value);
+        }
+    }
+
+    function parseMediaInfo(d) {
+        var result = '';
+        if (d) {
+            if (d.width) {
+                result = d.width + 'x' + d.height;
+            }
+            if (d.fps) {
+                result += '@' + d.fps;
+            }
+            if (d.hasVideo) {
+                result += ' video:' + d.profile + ' ' + d.level + ' ' + d.chromaFormat;
+            }
+            if (d.hasAudio) {
+                result += ' audio:' + d.audioSampleRate;
+            }
+            result += ' ' + d.videoCodec + ' ' + d.audioCodec;
+        }
+        return result;
+    }
+
+    function sizeFormat(size) {
+        const k = size / 1024;
+        if (k > 1024) {
+            return (k / 1024).toFixed(1) + 'm';
+        }
+        return Math.round(k) + 'k';
+    }
+
+    function buffered() {
+        var b = player.buffered;
+        if (b.length) {
+            return b.end(b.length - 1) - player.currentTime;
+        }
+        return 0;
+    }
+
+    init();
+</script>
+
+</html>

@@ -1,0 +1,76 @@
+{
+    "name": "las.js",
+    "version": "1.0.2",
+    "description": "fas.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "webpack --progress",
+        "tools": "webpack --progress --config ./webpack-tools.config.js",
+        "start": "webpack-dev-server --progress --watch --env.debug --disable-host-check --port 8081 --host '0.0.0.0'",
+        "test": "npm run test:unit && npm run test:func",
+        "test:unit": "karma start karma.conf.js",
+        "test:func": "karma start karma.conf.js --functional",
+        "changelog": "conventional-changelog -p angular -i CHANGELOG.md -w -s"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/KwaiVideoTeam/las"
+    },
+    "keywords": [
+        "las.js",
+        "video",
+        "flv",
+        "live"
+    ],
+    "author": "gengxing",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/KwaiVideoTeam/las/issues"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.7.2",
+        "@babel/plugin-proposal-class-properties": "^7.7.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+        "@babel/plugin-transform-object-assign": "^7.10.1",
+        "@babel/plugin-transform-runtime": "^7.6.2",
+        "@babel/preset-env": "^7.7.1",
+        "@babel/preset-typescript": "^7.7.2",
+        "babel-eslint": "^10.0.3",
+        "babel-loader": "^8.0.6",
+        "babel-preset-env": "^1.7.0",
+        "cz-conventional-changelog": "^3.0.2",
+        "eslint": "^6.6.0",
+        "eslint-loader": "^3.0.2",
+        "istanbul-instrumenter-loader": "^3.0.1",
+        "jasmine-core": "^3.5.0",
+        "karma": "^4.4.1",
+        "karma-babel-preprocessor": "^8.0.1",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-coverage-istanbul-reporter": "^2.1.0",
+        "karma-firefox-launcher": "^1.2.0",
+        "karma-jasmine": "^2.0.1",
+        "karma-mocha-reporter": "^2.2.5",
+        "karma-safari-launcher": "^1.0.0",
+        "karma-sourcemap-loader": "^0.3.7",
+        "karma-webpack": "^4.0.2",
+        "sinon": "^7.5.0",
+        "string-replace-loader": "^2.2.0",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.9.0",
+        "webpack-merge": "^4.2.2",
+        "webworkify": "^1.5.0",
+        "webworkify-webpack": "^2.1.5"
+    },
+    "directories": {
+        "dist": "dist",
+        "test": "test"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
+    }
+}
