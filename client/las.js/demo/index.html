@@ -23,62 +23,43 @@
             font-size: 16px;
         }
 
-        .bitrate {
-            margin-left: 10px;
-            margin-right: 5px;
-        }
-
         .baseBlock {
             margin-top: 5px;
-            margin-left: 5px;
-        }
-
-        #monitor {
-            width: 800px;
-            color: #011935;
-        }
-
-        #base {
-            font-size: 8px;
-            background-color: #EEEEEE;
-        }
-
-        #details {
-            display: flex;
-            flex-wrap: wrap;
-            /* background-color: #011935; */
+            width: 80%;
+            max-width: 1280px;
+            min-width: 800px;
         }
 
         #details span {
             margin: 5px;
             border-bottom: solid 1px #CCC;
-            min-width: 90px;
+            min-width: 120px;
         }
     </style>
     <link rel="stylesheet" href="lib/jquery/jquery-ui.min.css" />
 </head>
 
-<body>
-    <div class="ui-widget baseBlock" style="display: flex; width: 800px; justify-content: space-between">
+<body style="display: flex; flex-direction: column; align-items: center;">
+    <div class="ui-widget baseBlock" style="display: flex; justify-content: space-between">
         <img src="./logo.png" height="50" />
         <textarea id="manifestInput" placeholder="请输入：manifest地址 / manifest内容" class="ui-widget ui-corner-all"
             style="flex-grow:1; margin-right: 5px;" rows="3"></textarea>
         <span style="display: inline-flex;flex-direction: column;">
             <button onclick="play(manifestInput.value);" class="ui-button ui-widget ui-corner-all play-btn "
-                style="color: #fff;background-color: #337ab7;border-color: #2e6da4;width: 80px;vertical-align: top;">播放</button>
+                style="color: #fff;background-color: #337ab7;border-color: #2e6da4;width: 80px;vertical-align: top;">加载</button>
             <span id="time" style="text-align: end; margin: 5px;"></span>
         </span>
     </div>
     <label id="errorCode"></label>
     <section id="container" class="baseBlock">
-        <video id="player" controls="controls" width="800px" height="480px" autoplay muted></video>
+        <video id="player" controls="controls" width="100%" height="100%" autoplay muted></video>
     </section>
     <div id="progress" class="baseBlock" style="margin-top: 0"></div>
-    <div id="monitor" class="baseBlock" style="margin-top: 0;">
-        <div id="base"></div>
-        <div id="details"></div>
+    <div class="baseBlock" style="margin-top: 0;">
+        <div id="base" style="font-size: 8px; background-color: #EEEEEE;"></div>
+        <div id="details" style="display: flex; flex-wrap: wrap;"></div>
     </div>
-    <div id="levels" class="widget baseBlock">
+    <div id="levels" class="baseBlock">
         <h2>Current Level</h2>
         <div id="currentLevels"></div>
         <h2>Next Level</h2>
@@ -112,6 +93,11 @@
     var base = document.querySelector('#base');
     var details = document.querySelector('#details');
     var summary = document.querySelector('#summary');
+    var progress = document.querySelector('#progress');
+    bufferedBar.setSize(progress.clientWidth, 20);
+    window.addEventListener('resize', function () {
+        bufferedBar.setSize(progress.clientWidth, 20);
+    })
 
     setInterval(function () {
         bufferedBar.refresh();
@@ -226,10 +212,10 @@
         $("#nextLevels").append($(`<label for="next_-1">自动</label><input type="radio" class="levelRadio" name="next" id="next_-1">`));
 
         for (var i = 0; i < levels.length; i++) {
-            var label = $(`<label for="current_${i}">${levels[i].qualityTypeName}|${levels[i].bitrate}</label>`);
+            var label = $(`<label for="current_${i}">${levels[i].qualityTypeName || levels[i].bitrate}</label>`);
             var input = $(`<input type="radio" class="levelRadio" name="current" id="current_${i}">`);
             $("#currentLevels").append(label, input);
-            var nLabel = $(`<label for="next_${i}">${levels[i].qualityTypeName}|${levels[i].bitrate}</label>`);
+            var nLabel = $(`<label for="next_${i}">${levels[i].qualityTypeName || levels[i].bitrate}</label>`);
             var nInput = $(`<input type="radio" class="levelRadio" name="next" id="next_${i}">`);
             $("#nextLevels").append(nLabel, nInput);
         }
@@ -331,6 +317,8 @@
         if (u.query.u) {
             manifestInput.value = u.query.u;
             play(manifestInput.value);
+        } else {
+            play('manifest.json');
         }
     }
 
