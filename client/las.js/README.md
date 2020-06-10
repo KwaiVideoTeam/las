@@ -18,6 +18,7 @@ las.js直接在标准的[HTML &lt;video&gt;](https://developer.mozilla.org/zh-CN
 ## Demo
 
 ```js
+<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
 <video id="video"></video>
 <script>
     var video = document.getElementById('video');

@@ -5,6 +5,8 @@
     - [错误处理](#错误处理)
         - [错误恢复](#错误恢复)
     - [销毁](#销毁)
+    - [使用npm](#使用npm)
+        - [安装](#安装)
 
 # 快速入门
 
@@ -13,13 +15,13 @@
 首先在页面内引入las.js
 
 ```html
-<script src="/las.js"></script>
+<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
 ```
 
 调用静态方法：Las.isSupport()检查你的浏览器是否支持使用las.js
 
 ```html
-<script src="/las.js"></script>
+<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
 <script>
     if (Las.isSupported()) {
         console.log("hello");
@@ -37,7 +39,7 @@
 - 开始加载
 
 ```html
-<script src="/las.js"></script>
+<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
 
 <video id="video"></video>
 <script>
@@ -103,3 +105,10 @@ las.destroy()
 
 释放被调用的资源，破坏las上下文
 
+## 使用npm
+
+### 安装
+
+```js
+npm i las.js
+```
