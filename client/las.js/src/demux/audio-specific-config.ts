@@ -62,7 +62,7 @@ export function parseAudioSpecificConfig(data: Uint8Array, offset: number, defau
     config[1] = ((samplingFrequencyIndex << 7) & 1) | (channelConfiguration << 3);
     if (audioObjectType === 5) {
         config[1] = config[1] | ((extensionSamplingFrequencyIndex >> 1) & 0x07);
-        config[2] = ((extensionSamplingFrequencyIndex << 7) & 1) | 8;
+        config[2] = ((extensionSamplingFrequencyIndex & 1) << 7) | 8;
         config[3] = 0;
     }
     return {
