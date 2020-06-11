@@ -1,4 +1,6 @@
 [![npm](https://img.shields.io/npm/v/@kwai-video-team/las.js.svg?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
+[![npm](https://img.shields.io/npm/l/@kwai-video-team/las.js?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
+[![npm](https://img.shields.io/bundlephobia/min/@kwai-video-team/las.js?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
 [![](https://data.jsdelivr.com/v1/package/npm/@kwai-video-team/las.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@kwai-video-team/las.js)
 
 
