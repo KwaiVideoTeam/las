@@ -1,5 +1,5 @@
 {
-    "name": "las.js",
+    "name": "@kwai-video-team/las.js",
     "version": "1.0.2",
     "description": "fas.js",
     "main": "dist/index.js",
