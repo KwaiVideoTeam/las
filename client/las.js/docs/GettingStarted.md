@@ -15,13 +15,13 @@
 首先在页面内引入las.js
 
 ```html
-<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>
 ```
 
 调用静态方法：Las.isSupport()检查你的浏览器是否支持使用las.js
 
 ```html
-<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>
 <script>
     if (Las.isSupported()) {
         console.log("hello");
@@ -39,7 +39,7 @@
 - 开始加载
 
 ```html
-<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>
 
 <video id="video"></video>
 <script>
@@ -110,5 +110,5 @@ las.destroy()
 ### 安装
 
 ```js
-npm i las.js
+npm i @kwai-video-team/las.js
 ```

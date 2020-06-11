@@ -1,3 +1,7 @@
+[![npm](https://img.shields.io/npm/v/@kwai-video-team/las.js.svg?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
+[![](https://data.jsdelivr.com/v1/package/npm/@kwai-video-team/las.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@kwai-video-team/las.js)
+
+
 # las.js
 
 las.js是一个JavaScript库，可实现flv直播多码率客户端。它依靠HTML5 video和[MediaSource](https://developer.mozilla.org/zh-CN/docs/Web/API/MediaSource)扩展进行播放。
@@ -17,8 +21,10 @@ las.js直接在标准的[HTML &lt;video&gt;](https://developer.mozilla.org/zh-CN
 
 ## Demo
 
+https://kwaivideoteam.github.io/las.js/demo/index.html
+
 ```js
-<script src="https://kwaivideoteam.github.io/las.js/demo/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>
 <video id="video"></video>
 <script>
     var video = document.getElementById('video');
