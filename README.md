@@ -17,7 +17,7 @@ LAS has been widely supported by cloud vendors, such as Alibaba-Cloud, Baidu, Te
     |-- server #
         |-- las-server.sh   # deploy server by srs4.0 and higher version
     |-- transcode #
-        |-- las-trancode.sh # example for transcoding by ffmpeg
+        |-- las-transcode.sh # example for transcoding by ffmpeg
     |-- docs
         |-- las1.0.pdf
     |-- README.md
