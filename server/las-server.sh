@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # get the source code of SRS
-git clone  https://gitee.com/winlinvip/srs.oschina.git  srs &&
-cd srs/trunk && git remote set-url origin https://github.com/ossrs/srs.git && git pull
+git clone -b 4.0release https://github.com/dean-river/srs.git srs
+cd srs/trunk
 
 # compile the source code
 ./configure --with-las && make
