@@ -7,7 +7,7 @@ Rather than MPEG-DASH or HLS, breaking the content into a sequence of small file
 
 LAS has been widely supported by cloud vendors, such as Alibaba-Cloud, Baidu, Tencent Cloud, CDNetCenter, Kingsoft Cloud etc. Besides, it also has been deployed by Kuaishou, and used by more than one 100, 000, 000 users every day.
 
-### LAS
+### LAS structure
 ```
 |-- las
     |-- client
