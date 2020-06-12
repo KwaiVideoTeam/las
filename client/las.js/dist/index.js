@@ -8760,7 +8760,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   src_createClass(Las, null, [{
     key: "version",
     get: function get() {
-      return "1.0.2";
+      return "1.0.3";
     }
     /**
      * las.js的事件列表

@@ -1,7 +1,7 @@
 [![npm](https://img.shields.io/npm/v/@kwai-video-team/las.js.svg?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
-[![npm](https://img.shields.io/npm/l/@kwai-video-team/las.js?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
-[![npm](https://img.shields.io/bundlephobia/min/@kwai-video-team/las.js?style=flat)](https://npmjs.org/package/@kwai-video-team/las.js)
 [![](https://data.jsdelivr.com/v1/package/npm/@kwai-video-team/las.js/badge?style=rounded)](https://www.jsdelivr.com/package/npm/@kwai-video-team/las.js)
+![npm](https://img.shields.io/npm/l/@kwai-video-team/las.js?style=flat)
+![npm](https://img.shields.io/bundlephobia/min/@kwai-video-team/las.js?style=flat)
 
 
 # las.js
@@ -14,12 +14,12 @@ las.js直接在标准的[HTML &lt;video&gt;](https://developer.mozilla.org/zh-CN
 
 ## 快速入门
 
-[快速入门](./docs/GettingStarted.md)
+docs/GettingStarted.md
 
 
 ## API文档
 
-[API文档及代码示例](./docs/API.md)
+docs/API.md
 
 ## Demo
 
