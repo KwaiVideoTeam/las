@@ -1,8 +1,8 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:42:49 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:42:49 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-06-30 16:32:42
  */
 import { EventEmitter } from 'events';
 import AbrLevel from './abr/abr-level';
@@ -18,6 +18,7 @@ import { MP4RemuxResult } from './types/remux';
 import BrowserHelper from './utils/browser-helper';
 import { isSupported } from './utils/is-supported';
 import { Log } from './utils/log';
+import PlaybackRateManager from './utils/playback-rate-manager';
 
 // 循环计时器间隔，毫秒
 const MAIN_TIMER_INTERVAL = 200;
@@ -57,6 +58,8 @@ export default class Las extends EventEmitter {
     private _playingLevel?: number;
     private _startLevel?: number;
     private _monitor!: Monitor;
+
+    private _playbackRateManager?: PlaybackRateManager;
 
     /**
      * 浏览器是否支持las.js
@@ -134,6 +137,9 @@ export default class Las extends EventEmitter {
         this._stat = STAT.INIT;
         this._startMainTimer();
         this._initMonitor();
+        if (this._config.autoPlaybackRateConf) {
+            this._playbackRateManager = new PlaybackRateManager(this._media, this._config.autoPlaybackRateConf);
+        }
         Log.i(this.tag, Las.version, this._config);
     }
 
@@ -189,6 +195,9 @@ export default class Las extends EventEmitter {
      * 回收资源
      */
     public destroy(): void {
+        if (this._playbackRateManager) {
+            this._playbackRateManager.destroy();
+        }
         this._stopMonitor();
         this._stopMainTimer();
         this._unbindVideoEvents();
@@ -219,6 +228,9 @@ export default class Las extends EventEmitter {
             this._mse.endOfData();
             this._loadStopped = true;
             this._monitor.onStopLoad();
+        }
+        if (this._playbackRateManager) {
+            this._playbackRateManager.stop();
         }
     }
 
@@ -524,6 +536,9 @@ export default class Las extends EventEmitter {
         this._initLasMain();
         if (this._lasMain) {
             this._lasMain.load();
+        }
+        if (this._config.autoPlaybackRate && this._playbackRateManager) {
+            this._playbackRateManager.start();
         }
     }
 
