@@ -3106,7 +3106,7 @@ var flv_script_tag_decoder_FlvScriptTagDecoder = /*#__PURE__*/function () {
  * @Author: gengxing 
  * @Date: 2020-06-09 11:53:14 
  * @Last Modified by: gengxing
- * @Last Modified time: 2020-06-09 15:26:13
+ * @Last Modified time: 2020-06-30 18:29:55
  * flv解封装
  */
 
@@ -3658,8 +3658,7 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
 
   _proto._flushNonMonotonousCache = function _flushNonMonotonousCache() {
     if (this._nonMonotonousTagCache) {
-      var nonMonotonousCache = this._nonMonotonousTagCache;
-      var cache = nonMonotonousCache;
+      var cache = this._nonMonotonousTagCache;
 
       while (cache.length) {
         var data = cache.shift();
@@ -3951,7 +3950,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ "./src/index.ts":
 /*!***********************************!*\
-  !*** ./src/index.ts + 22 modules ***!
+  !*** ./src/index.ts + 23 modules ***!
   \***********************************/
 /*! exports provided: default */
 /*! ModuleConcatenation bailout: Cannot concat with ./src/core/errors.ts because of ./src/demux/flv/flv-demuxer-worker.ts */
@@ -3987,8 +3986,8 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:37:56 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:37:56 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-06-30 17:34:44
  * 配置解析处理
  */
 
@@ -4006,8 +4005,9 @@ var DEFAULT_CONFIG = {
   // 流连接超时
   transmissionTimeout: 30000,
   // 流传输超时
-  autoRecoverMedia: false // 尝试自动恢复video.error
-
+  autoRecoverMedia: false,
+  // 尝试自动恢复video.error
+  autoPlaybackRate: true
 };
 
 var config_ConfigHelper = /*#__PURE__*/function () {
@@ -4032,7 +4032,55 @@ var config_ConfigHelper = /*#__PURE__*/function () {
     }
 
     config.gopRemux = browser_helper["default"].isSafari;
+
+    this._initPlayBackRateRule(config);
+
     return config;
+  }
+  /**
+   * 初始化自动倍速配置
+   * @param config config
+   */
+  ;
+
+  ConfigHelper._initPlayBackRateRule = function _initPlayBackRateRule(config) {
+    var conf = config.autoPlaybackRateConf;
+
+    if (conf) {
+      var rule = conf.rule;
+
+      if (rule && Array.isArray(rule)) {
+        rule = rule.filter(function (item) {
+          return item.upper > item.lower && item.rate > 0;
+        }); // 速度控制规则，按playbackRate倒序
+
+        rule.sort(function (a, b) {
+          return b.rate - a.rate;
+        });
+
+        if (rule.length > 1) {
+          conf.rule = rule;
+          config.autoPlaybackRateConf = conf;
+          return;
+        }
+      }
+    } else {
+      var delay = -config.defaultLiveDelay / 1000;
+      var abrPlabackRateConf = {
+        startDelay: delay,
+        interval: 0.2,
+        rule: [{
+          rate: 1.1,
+          lower: delay + 1,
+          upper: Number.MAX_SAFE_INTEGER
+        }, {
+          rate: 1,
+          lower: 0,
+          upper: delay
+        }]
+      };
+      config.autoPlaybackRateConf = abrPlabackRateConf;
+    }
   };
 
   return ConfigHelper;
@@ -5247,9 +5295,9 @@ var CONFIG = {
   generateSpeedGapMs: 3000,
   bufferCheckIntervalMs: 500,
   smoothedSpeedUtilizationRatio: 0.8,
-  smallSpeedToBitrateRatio: 0.7,
+  smallSpeedToBitrateRatio: 0.4,
   enoughSpeedToBitrateRatio: 0.9,
-  bufferLowerLimitSecond: 0.8,
+  bufferLowerLimitSecond: 0.6,
   recentBufferedSize: 16,
   smoothedSpeedRatio: 0.9,
   isSpeedFullyUsed: true
@@ -5299,7 +5347,7 @@ var abr_algorithm_simple_AbrAlgorithmSimple = /*#__PURE__*/function (_EventEmitt
     log["Log"].i(abr_algorithm_simple_tag, 'init', manifest, config, this._conf);
     this._levels = manifest.levels.slice(0);
     this._next = manifest.default;
-    this._pastBuffer = [0];
+    this._pastBuffer = [0.1];
 
     if (status) {
       this._timer = setInterval(function () {
@@ -8698,6 +8746,116 @@ function isSupported() {
   var streaming = FetchLoader.isSupport() || XHR.isSupportChunk() === XHR_TYPE.MOZ_CHUNK;
   return isTypeSupported && sourceBufferValidAPI && streaming;
 }
+// CONCATENATED MODULE: ./src/utils/playback-rate-manager.ts
+/*
+ * @Author: gengxing
+ * @Date: 2020-06-30 16:22:55
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-06-30 18:29:35
+ */
+
+/**
+ * 播放速度控制
+ */
+
+var playback_rate_manager_PlaybackRateManager = /*#__PURE__*/function () {
+  function PlaybackRateManager(media, config) {
+    this.tag = 'PlaybackRateManager';
+    this._media = void 0;
+    this._config = void 0;
+    this._interval = 0;
+    this._timer = void 0;
+    this._media = media;
+    this._config = config;
+  }
+  /**
+   * 启动自动倍速控制
+   */
+
+
+  var _proto = PlaybackRateManager.prototype;
+
+  _proto.start = function start() {
+    this._interval = this._interval || this._config.startDelay || this._config.interval || 5;
+
+    this._tick();
+
+    this._interval = this._config.interval || 1;
+  }
+  /**
+   * 停止自动倍速控制
+   */
+  ;
+
+  _proto.stop = function stop() {
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = 0;
+    }
+  };
+
+  _proto.destroy = function destroy() {
+    if (this._timer) {
+      clearTimeout(this._timer);
+      this._timer = 0;
+    }
+  };
+
+  _proto._tick = function _tick() {
+    var _this = this;
+
+    if (!this._timer) {
+      this._timer = setTimeout(function () {
+        if (_this._media.video) {
+          _this._nextPlayBackRate(_this._media.bufferedSec(), _this._media.video);
+        }
+
+        _this._timer = 0;
+
+        _this._tick();
+      }, this._interval * 1000);
+    }
+  }
+  /**
+   * 处理一次播放倍速计算
+   * @param buffered 当前待播放的buffer长度，秒
+   * @param video video
+   */
+  ;
+
+  _proto._nextPlayBackRate = function _nextPlayBackRate(buffered, video) {
+    var playbackRate = 1;
+    var rule = this._config.rule;
+    var i = 0;
+
+    for (i = 0; i < rule.length; i++) {
+      if (video.playbackRate >= rule[i].rate) {
+        break;
+      }
+    }
+
+    var downRule = i < rule.length - 1 ? rule[i + 1] : null;
+    var upRule = i > 0 ? rule[i - 1] : null;
+    playbackRate = rule[i].rate;
+
+    if (upRule && buffered > upRule.lower) {
+      playbackRate = upRule.rate;
+    }
+
+    if (downRule && buffered < downRule.upper) {
+      playbackRate = downRule.rate;
+    }
+
+    if (video.playbackRate !== playbackRate) {
+      log["Log"].i(this.tag, "auto change playback rate from " + video.playbackRate + " to " + playbackRate);
+      video.playbackRate = playbackRate;
+    }
+  };
+
+  return PlaybackRateManager;
+}();
+
+/* harmony default export */ var playback_rate_manager = (playback_rate_manager_PlaybackRateManager);
 // CONCATENATED MODULE: ./src/index.ts
 function src_extends() { src_extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return src_extends.apply(this, arguments); }
 
@@ -8712,9 +8870,10 @@ function src_inheritsLoose(subClass, superClass) { subClass.prototype = Object.c
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:42:49 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:42:49 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-06-30 16:32:42
  */
+
 
 
 
@@ -8760,7 +8919,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   src_createClass(Las, null, [{
     key: "version",
     get: function get() {
-      return "1.0.3";
+      return "1.0.4";
     }
     /**
      * las.js的事件列表
@@ -8820,6 +8979,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
     _this._playingLevel = void 0;
     _this._startLevel = void 0;
     _this._monitor = void 0;
+    _this._playbackRateManager = void 0;
 
     _this._onVideoLoadeddata = function () {
       log["Log"].i(_this.tag, 'loadeddata');
@@ -9010,6 +9170,10 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
 
     _this._initMonitor();
 
+    if (_this._config.autoPlaybackRateConf) {
+      _this._playbackRateManager = new playback_rate_manager(_this._media, _this._config.autoPlaybackRateConf);
+    }
+
     log["Log"].i(_this.tag, Las.version, _this._config);
     return _this;
   }
@@ -9086,6 +9250,10 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   ;
 
   _proto.destroy = function destroy() {
+    if (this._playbackRateManager) {
+      this._playbackRateManager.destroy();
+    }
+
     this._stopMonitor();
 
     this._stopMainTimer();
@@ -9130,6 +9298,10 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
       this._loadStopped = true;
 
       this._monitor.onStopLoad();
+    }
+
+    if (this._playbackRateManager) {
+      this._playbackRateManager.stop();
     }
   }
   /**
@@ -9300,6 +9472,10 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
 
     if (this._lasMain) {
       this._lasMain.load();
+    }
+
+    if (this._config.autoPlaybackRate && this._playbackRateManager) {
+      this._playbackRateManager.start();
     }
   }
   /**

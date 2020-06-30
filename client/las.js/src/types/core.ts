@@ -1,10 +1,16 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:47:40 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:47:40 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-06-30 16:22:41
  */
 import { LOG_LEVEL } from '../utils/log';
+
+export type AutoPlaybackRateConfig = {
+    startDelay: number;
+    interval: number;
+    rule: { rate: number; lower: number; upper: number }[];
+};
 
 export type LoadConfig = {
 };
@@ -40,6 +46,8 @@ export type LasMainConfig = {
     AbrConfig;;
 
 export type LasConfig = {
+    autoPlaybackRate: boolean;
+    autoPlaybackRateConf?: AutoPlaybackRateConfig;
 } & MSEConfig &
     LasMainConfig;
 

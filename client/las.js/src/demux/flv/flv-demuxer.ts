@@ -2,7 +2,7 @@
  * @Author: gengxing 
  * @Date: 2020-06-09 11:53:14 
  * @Last Modified by: gengxing
- * @Last Modified time: 2020-06-09 15:26:13
+ * @Last Modified time: 2020-06-30 18:29:55
  * flv解封装
  */
 import { EventEmitter } from 'events';
@@ -476,8 +476,7 @@ class FlvDemux {
      */
     private _flushNonMonotonousCache() {
         if (this._nonMonotonousTagCache) {
-            const nonMonotonousCache = this._nonMonotonousTagCache;
-            const cache = nonMonotonousCache;
+            const cache = this._nonMonotonousTagCache;
             while (cache.length) {
                 const data = cache.shift();
                 if (data) {
