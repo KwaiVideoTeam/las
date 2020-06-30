@@ -36,9 +36,9 @@ const CONFIG: AdaptiveConfig = {
     generateSpeedGapMs: 3000,
     bufferCheckIntervalMs: 500,
     smoothedSpeedUtilizationRatio: 0.8,
-    smallSpeedToBitrateRatio: 0.7,
+    smallSpeedToBitrateRatio: 0.4,
     enoughSpeedToBitrateRatio: 0.9,
-    bufferLowerLimitSecond: 0.8,
+    bufferLowerLimitSecond: 0.6,
     recentBufferedSize: 16,
     smoothedSpeedRatio: 0.9,
     isSpeedFullyUsed: true,
@@ -76,7 +76,7 @@ class AbrAlgorithmSimple extends EventEmitter implements IAbrAlgorithm {
 
         this._levels = manifest.levels.slice(0);
         this._next = manifest.default;
-        this._pastBuffer = [0];
+        this._pastBuffer = [0.1];
         if (status) {
             this._timer = setInterval(() => { this._checkBuffer(status); }, this._conf.bufferCheckIntervalMs);
         }
