@@ -331,10 +331,10 @@
     }
 
     function parseMediaInfo(d) {
-        var result = '';
+        var result = 'v' + Las.version + ' ';
         if (d) {
             if (d.width) {
-                result = d.width + 'x' + d.height;
+                result += d.width + 'x' + d.height;
             }
             if (d.fps) {
                 result += '@' + d.fps;
