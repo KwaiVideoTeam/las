@@ -37,7 +37,6 @@ class ConfigHelper {
         if (config.debug) {
             Log.level(config.debug);
         }
-        config.gopRemux = BrowserHelper.isSafari;
         this._initPlayBackRateRule(config);
         return config;
     }

@@ -2432,7 +2432,7 @@ function parseAudioSpecificConfig(data, offset, defaultCodec) {
 
 
   config[0] = audioObjectType << 3 | samplingFrequencyIndex >> 1 & 0x07;
-  config[1] = samplingFrequencyIndex << 7 & 1 | channelConfiguration << 3;
+  config[1] = samplingFrequencyIndex << 7 & 0x80 | channelConfiguration << 3;
 
   if (audioObjectType === 5) {
     config[1] = config[1] | extensionSamplingFrequencyIndex >> 1 & 0x07;
@@ -3522,7 +3522,7 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
         dts: dts,
         cts: tag.cts,
         pts: pts,
-        streamDTS: dts,
+        streamDTS: tag.timestamp,
         key: keyframe
       };
       track.samples.push(avcSample);
@@ -3537,7 +3537,11 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
    */
   ;
 
-  _proto._parseAudioData = function _parseAudioData(tag) {
+  _proto._parseAudioData = function _parseAudioData(tag, fromNonMonotonousCache) {
+    if (fromNonMonotonousCache === void 0) {
+      fromNonMonotonousCache = false;
+    }
+
     if (!tag.body) {
       return;
     }
@@ -3586,10 +3590,20 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
         var dtsDiff = tag.timestamp - dts;
         var threshold = aacFrameLen * AUDIO_TIME_ORIGIN_THRESHOLD;
 
-        if (dtsDiff > threshold || dtsDiff < -threshold) {
+        if (dtsDiff > threshold) {
           // 超出阈值使用tag.timestamp
           dts = tag.timestamp;
+        } else if (!fromNonMonotonousCache && dtsDiff < -threshold) {
+          this._onNonMonotonous({
+            tag: tag
+          }, TrackType.audio);
+
+          return;
         }
+      }
+
+      if (!fromNonMonotonousCache && this._nonMonotonousTagCache) {
+        this._flushNonMonotonousCache();
       }
 
       var aacSample = {
@@ -3616,13 +3630,17 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
 
   _proto._onNonMonotonous = function _onNonMonotonous(data, type) {
     if (!this._nonMonotonousTagCache) {
-      this._nonMonotonousTagCache = [];
+      this._nonMonotonousTagCache = {
+        video: [],
+        audio: []
+      };
+      ;
     }
 
-    var cache = this._nonMonotonousTagCache;
+    var cache = this._nonMonotonousTagCache[type];
 
     if (cache.length > DISCONTINUITY_ON_NON_MONOTONOUS) {
-      this.flush();
+      this._remuxer.flush();
 
       var lastPTS = this._remuxer.getLastPTS();
 
@@ -3658,13 +3676,21 @@ var flv_demuxer_FlvDemux = /*#__PURE__*/function () {
 
   _proto._flushNonMonotonousCache = function _flushNonMonotonousCache() {
     if (this._nonMonotonousTagCache) {
-      var cache = this._nonMonotonousTagCache;
+      var nonMonotonousCache = this._nonMonotonousTagCache;
 
-      while (cache.length) {
-        var data = cache.shift();
+      for (var key in nonMonotonousCache) {
+        var cache = nonMonotonousCache[key];
 
-        if (data) {
-          this._parseAVCVideoData(data.tag, data.dataOffset, true);
+        while (cache.length) {
+          var data = cache.shift();
+
+          if (data) {
+            if (key === 'video') {
+              this._parseAVCVideoData(data.tag, data.dataOffset || 0, true);
+            } else if (key === 'audio') {
+              this._parseAudioData(data.tag, true);
+            }
+          }
         }
       }
 
@@ -3974,9 +4000,6 @@ __webpack_require__.d(__webpack_exports__, "default", function() { return /* bin
 // EXTERNAL MODULE: ./node_modules/events/events.js
 var events = __webpack_require__("./node_modules/events/events.js");
 
-// EXTERNAL MODULE: ./src/utils/browser-helper.ts
-var browser_helper = __webpack_require__("./src/utils/browser-helper.ts");
-
 // EXTERNAL MODULE: ./src/utils/log.ts
 var log = __webpack_require__("./src/utils/log.ts");
 
@@ -3990,7 +4013,6 @@ function _extends() { _extends = Object.assign || function (target) { for (var i
  * @Last Modified time: 2020-06-30 17:34:44
  * 配置解析处理
  */
-
 
 var DEFAULT_CONFIG = {
   webWorker: true,
@@ -4030,8 +4052,6 @@ var config_ConfigHelper = /*#__PURE__*/function () {
     if (config.debug) {
       log["Log"].level(config.debug);
     }
-
-    config.gopRemux = browser_helper["default"].isSafari;
 
     this._initPlayBackRateRule(config);
 
@@ -8725,6 +8745,9 @@ var monitor_Monitor = /*#__PURE__*/function (_EventEmitter) {
 }(events["EventEmitter"]);
 
 /* harmony default export */ var monitor = (monitor_Monitor);
+// EXTERNAL MODULE: ./src/utils/browser-helper.ts
+var browser_helper = __webpack_require__("./src/utils/browser-helper.ts");
+
 // CONCATENATED MODULE: ./src/utils/is-supported.ts
 /*
  * @Author: gengxing 
@@ -8919,7 +8942,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   src_createClass(Las, null, [{
     key: "version",
     get: function get() {
-      return "1.0.4";
+      return "1.0.5";
     }
     /**
      * las.js的事件列表
