@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # get the source code of SRS
-git clone -b 4.0release https://github.com/dean-river/srs.git srs
+git clone -b feature/las https://github.com/dean-river/srs.git srs
 cd srs/trunk
 
 # compile the source code
