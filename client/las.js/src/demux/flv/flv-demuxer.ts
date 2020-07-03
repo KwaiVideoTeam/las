@@ -22,7 +22,7 @@ const DISCONTINUITY_ON_NON_MONOTONOUS = 10;
 
 const AUDIO_TIME_ORIGIN_THRESHOLD = 5;
 
-type TagCacheItem = { tag: FlvTag, dataOffset: number };
+type TagCacheItem = { tag: FlvTag, dataOffset?: number };
 class FlvDemux {
     private tag = 'FlvDemux';
     private _eventEmitter: EventEmitter;
@@ -35,7 +35,7 @@ class FlvDemux {
     private _remuxStat?: { timeOffset: number; isContinuous: boolean };
     private _audioLastDTS: number = 0;
     private _videoLastDTS: number = 0;
-    private _nonMonotonousTagCache?: TagCacheItem[];
+    private _nonMonotonousTagCache?: Record<string, TagCacheItem[]>;
 
     private _audioCodec: string = '';
     private _videoCodec: string = '';
@@ -365,7 +365,7 @@ class FlvDemux {
                 dts: dts,
                 cts: tag.cts,
                 pts: pts,
-                streamDTS: dts,
+                streamDTS: tag.timestamp,
                 key: keyframe
             };
             track.samples.push(avcSample);
@@ -378,7 +378,7 @@ class FlvDemux {
      * 解析音频tag
      * @param tag flv tag
      */
-    private _parseAudioData(tag: FlvTag) {
+    private _parseAudioData(tag: FlvTag, fromNonMonotonousCache: boolean = false) {
         if (!tag.body) {
             return;
         }
@@ -419,10 +419,17 @@ class FlvDemux {
                 dts = this._audioLastDTS + aacFrameLen;
                 const dtsDiff = tag.timestamp - dts;
                 let threshold = aacFrameLen * AUDIO_TIME_ORIGIN_THRESHOLD;
-                if (dtsDiff > threshold || dtsDiff < -threshold) {
+                if (dtsDiff > threshold) {
                     // 超出阈值使用tag.timestamp
                     dts = tag.timestamp;
+                } else if (!fromNonMonotonousCache && dtsDiff < -threshold) {
+                    this._onNonMonotonous({ tag }, TrackType.audio);
+                    return;
                 }
+            }
+
+            if (!fromNonMonotonousCache && this._nonMonotonousTagCache) {
+                this._flushNonMonotonousCache();
             }
 
             const aacSample = {
@@ -448,11 +455,14 @@ class FlvDemux {
      */
     private _onNonMonotonous(data: TagCacheItem, type: TrackType) {
         if (!this._nonMonotonousTagCache) {
-            this._nonMonotonousTagCache = [];
+            this._nonMonotonousTagCache = {
+                video: [],
+                audio: []
+            };;
         }
-        const cache = this._nonMonotonousTagCache;
+        const cache = this._nonMonotonousTagCache[type];
         if (cache.length > DISCONTINUITY_ON_NON_MONOTONOUS) {
-            this.flush();
+            this._remuxer.flush();
             const lastPTS = this._remuxer.getLastPTS();
             let ptsSync: number = lastPTS.audio;
             if (ptsSync === 0 || (lastPTS.video > 0 && lastPTS.video < ptsSync)) {
@@ -476,11 +486,18 @@ class FlvDemux {
      */
     private _flushNonMonotonousCache() {
         if (this._nonMonotonousTagCache) {
-            const cache = this._nonMonotonousTagCache;
-            while (cache.length) {
-                const data = cache.shift();
-                if (data) {
-                    this._parseAVCVideoData(data.tag, data.dataOffset, true);
+            const nonMonotonousCache = this._nonMonotonousTagCache;
+            for (const key in nonMonotonousCache) {
+                const cache = nonMonotonousCache[key];
+                while (cache.length) {
+                    const data = cache.shift();
+                    if (data) {
+                        if (key === 'video') {
+                            this._parseAVCVideoData(data.tag, data.dataOffset || 0, true);
+                        } else if (key === 'audio') {
+                            this._parseAudioData(data.tag, true);
+                        }
+                    }
                 }
             }
             this._nonMonotonousTagCache = undefined;
