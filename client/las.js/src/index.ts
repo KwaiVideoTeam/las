@@ -2,7 +2,7 @@
  * @Author: gengxing 
  * @Date: 2020-06-09 11:42:49 
  * @Last Modified by: gengxing
- * @Last Modified time: 2020-06-30 16:32:42
+ * @Last Modified time: 2020-08-04 12:18:49
  */
 import { EventEmitter } from 'events';
 import AbrLevel from './abr/abr-level';
@@ -64,7 +64,7 @@ export default class Las extends EventEmitter {
     /**
      * 浏览器是否支持las.js
      */
-    static isSupport(): boolean {
+    static isSupported(): boolean {
         return isSupported();
     }
 
@@ -120,7 +120,7 @@ export default class Las extends EventEmitter {
             }, 0);
             return;
         }
-        if (!Las.isSupport()) {
+        if (!Las.isSupported()) {
             setTimeout(() => {
                 this._onError({
                     type: ErrorTypes.OTHER_ERROR,

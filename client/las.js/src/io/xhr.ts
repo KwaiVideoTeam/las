@@ -1,8 +1,8 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:38 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:38 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:18:22
  * 封装的xhr
  */
 import { IInternalLoader, IInternalLoaderCallback, ILoaderContext } from '../types/io';
@@ -29,7 +29,7 @@ export class XHR implements IInternalLoader<ILoaderContext> {
     private _msBufferUpper: number = 16 * 1024 * 1024; // 16MB
     private _progress: XHR_TYPE = XHR_TYPE.UNKNOW;
 
-    static isSupportChunk() {
+    static isSupportedChunk() {
         if (XHR.supportChunk !== XHR_TYPE.UNKNOW) {
             return XHR.supportChunk;
         }
@@ -73,7 +73,7 @@ export class XHR implements IInternalLoader<ILoaderContext> {
         this._context = context;
         this._progress = XHR_TYPE.UNSUPPORT;
         if (context.progress && context.responseType === 'arraybuffer') {
-            this._progress = XHR.isSupportChunk();
+            this._progress = XHR.isSupportedChunk();
             if (this._progress === XHR_TYPE.MS_STREAM) {
                 const reader = this._reader = new (self as any).MSStreamReader();
                 reader.onprogress = this._msrOnProgress.bind(this);

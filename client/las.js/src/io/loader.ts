@@ -1,8 +1,8 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:30 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:30 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:20:04
  * 下载器
  */
 import { IInternalLoader, IInternalLoaderCallback, ILoader, ILoaderCallback, ILoaderConfig, ILoaderContext, ILoaderStats } from '../types/io';
@@ -118,9 +118,9 @@ export default class Loader<T extends ILoaderContext> implements ILoader<T> {
             return ChunkLoader;
         }
         ChunkLoader = null;
-        if (FetchLoader.isSupport()) {
+        if (FetchLoader.isSupported()) {
             ChunkLoader = FetchLoader;
-        } else if (XHR.isSupportChunk()) {
+        } else if (XHR.isSupportedChunk()) {
             ChunkLoader = XHR;
         }
         return ChunkLoader;

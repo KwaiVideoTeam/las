@@ -1,8 +1,8 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:45:18 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:45:18 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:18:04
  * 浏览器能力检测，是否支持flv播放
  */
 import FetchLoader from '../io/fetch';
@@ -25,6 +25,6 @@ export function isSupported(): boolean {
             typeof sourceBuffer.prototype.remove === 'function');
 
     // Loader
-    let streaming = FetchLoader.isSupport() || XHR.isSupportChunk() === XHR_TYPE.MOZ_CHUNK;
+    let streaming = FetchLoader.isSupported() || XHR.isSupportedChunk() === XHR_TYPE.MOZ_CHUNK;
     return isTypeSupported && sourceBufferValidAPI && streaming;
 }

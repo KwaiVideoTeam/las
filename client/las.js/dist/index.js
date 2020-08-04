@@ -4312,8 +4312,8 @@ var abr_manifest_AbrManifest = /*#__PURE__*/function () {
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:16 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:16 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:20:00
  * 封装的fetch
  */
 var FetchLoader = /*#__PURE__*/function () {
@@ -4330,7 +4330,7 @@ var FetchLoader = /*#__PURE__*/function () {
    * broswer is support moz-chunk
    * @returns 是否支持
    */
-  FetchLoader.isSupport = function isSupport() {
+  FetchLoader.isSupported = function isSupported() {
     if (self.fetch && self.ReadableStream) {
       return true;
     }
@@ -4518,8 +4518,8 @@ var FetchLoader = /*#__PURE__*/function () {
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:38 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:38 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:18:22
  * 封装的xhr
  */
 var XHR_TYPE;
@@ -4537,7 +4537,7 @@ var XHR_TYPE;
 
 var XHR = /*#__PURE__*/function () {
   // 16MB
-  XHR.isSupportChunk = function isSupportChunk() {
+  XHR.isSupportedChunk = function isSupportedChunk() {
     if (XHR.supportChunk !== XHR_TYPE.UNKNOW) {
       return XHR.supportChunk;
     }
@@ -4600,7 +4600,7 @@ var XHR = /*#__PURE__*/function () {
     this._progress = XHR_TYPE.UNSUPPORT;
 
     if (context.progress && context.responseType === 'arraybuffer') {
-      this._progress = XHR.isSupportChunk();
+      this._progress = XHR.isSupportedChunk();
 
       if (this._progress === XHR_TYPE.MS_STREAM) {
         var reader = this._reader = new self.MSStreamReader();
@@ -4779,8 +4779,8 @@ function loader_createClass(Constructor, protoProps, staticProps) { if (protoPro
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:30 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:30 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:20:04
  * 下载器
  */
 
@@ -4986,9 +4986,9 @@ var loader_Loader = /*#__PURE__*/function () {
 
     ChunkLoader = null;
 
-    if (FetchLoader.isSupport()) {
+    if (FetchLoader.isSupported()) {
       ChunkLoader = FetchLoader;
-    } else if (XHR.isSupportChunk()) {
+    } else if (XHR.isSupportedChunk()) {
       ChunkLoader = XHR;
     }
 
@@ -8752,13 +8752,13 @@ var browser_helper = __webpack_require__("./src/utils/browser-helper.ts");
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:45:18 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:45:18 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:18:04
  * 浏览器能力检测，是否支持flv播放
  */
 
 
-function isSupported() {
+function is_supported_isSupported() {
   var mediaSource = window.MediaSource || window.WebKitMediaSource;
   var sourceBuffer = window.SourceBuffer || window.WebKitSourceBuffer; // 解码
 
@@ -8766,7 +8766,7 @@ function isSupported() {
 
   var sourceBufferValidAPI = !sourceBuffer || sourceBuffer.prototype && typeof sourceBuffer.prototype.appendBuffer === 'function' && typeof sourceBuffer.prototype.remove === 'function'; // Loader
 
-  var streaming = FetchLoader.isSupport() || XHR.isSupportChunk() === XHR_TYPE.MOZ_CHUNK;
+  var streaming = FetchLoader.isSupported() || XHR.isSupportedChunk() === XHR_TYPE.MOZ_CHUNK;
   return isTypeSupported && sourceBufferValidAPI && streaming;
 }
 // CONCATENATED MODULE: ./src/utils/playback-rate-manager.ts
@@ -8894,7 +8894,7 @@ function src_inheritsLoose(subClass, superClass) { subClass.prototype = Object.c
  * @Author: gengxing 
  * @Date: 2020-06-09 11:42:49 
  * @Last Modified by: gengxing
- * @Last Modified time: 2020-06-30 16:32:42
+ * @Last Modified time: 2020-08-04 12:18:49
  */
 
 
@@ -8931,8 +8931,8 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   /**
    * 浏览器是否支持las.js
    */
-  Las.isSupport = function isSupport() {
-    return isSupported();
+  Las.isSupported = function isSupported() {
+    return is_supported_isSupported();
   }
   /**
    * las.js当前版本
@@ -8942,7 +8942,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
   src_createClass(Las, null, [{
     key: "version",
     get: function get() {
-      return "1.0.5";
+      return "1.0.6";
     }
     /**
      * las.js的事件列表
@@ -9172,7 +9172,7 @@ var src_Las = /*#__PURE__*/function (_EventEmitter) {
       return src_assertThisInitialized(_this);
     }
 
-    if (!Las.isSupport()) {
+    if (!Las.isSupported()) {
       setTimeout(function () {
         _this._onError({
           type: errors["ErrorTypes"].OTHER_ERROR,

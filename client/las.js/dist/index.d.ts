@@ -113,7 +113,7 @@ declare class Las {
     /**
      * 浏览器是否支持las.js
      */
-    static isSupport(): boolean;
+    static isSupported(): boolean;
 
     /**
      * las.js的事件列表

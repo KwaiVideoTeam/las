@@ -18,7 +18,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>
 ```
 
-调用静态方法：Las.isSupport()检查你的浏览器是否支持使用las.js
+调用静态方法：Las.isSupported()检查你的浏览器是否支持使用las.js
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@kwai-video-team/las.js@latest"></script>

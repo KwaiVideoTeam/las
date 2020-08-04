@@ -1,8 +1,8 @@
 /*
  * @Author: gengxing 
  * @Date: 2020-06-09 11:50:16 
- * @Last Modified by:   gengxing 
- * @Last Modified time: 2020-06-09 11:50:16 
+ * @Last Modified by: gengxing
+ * @Last Modified time: 2020-08-04 12:20:00
  * 封装的fetch
  */
 import { IInternalLoader, IInternalLoaderCallback, ILoaderContext } from '../types/io';
@@ -19,7 +19,7 @@ export default class FetchLoader implements IInternalLoader<ILoaderContext> {
      * broswer is support moz-chunk
      * @returns 是否支持
      */
-    static isSupport(): boolean {
+    static isSupported(): boolean {
         if (self.fetch && self.ReadableStream) {
             return true;
         }
