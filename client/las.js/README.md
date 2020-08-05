@@ -74,3 +74,25 @@ flv资源必须允许GET请求，且包含[CORS](https://developer.mozilla.org/z
 ## License
 
 MIT
+
+## 本地运行las.js
+
+拉取源码并安装：
+
+```
+git clone https://github.com/KwaiVideoTeam/las.git
+cd las/client/las.js
+npm i
+```
+
+运行dev-server：
+
+```
+npm run start
+```
+
+浏览器中打开demo页：
+
+```
+http://127.0.0.1:8081/demo
+```
