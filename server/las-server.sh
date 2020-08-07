@@ -8,4 +8,4 @@ cd srs/trunk
 ./configure --with-las && make
 
 # start the service
-./objs/srs -c conf/srs.conf
+./objs/srs -c conf/las.conf
