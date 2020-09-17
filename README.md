@@ -12,8 +12,7 @@ LAS has been widely supported by cloud vendors, such as Alibaba-Cloud, Baidu, Te
 |-- las
     |-- client
         |-- las.js  # for web
-        |-- ios     # todo
-        |-- android # todo
+        |-- las-mobile  # for mobile
     |-- server #
         |-- las-server.sh   # deploy server by srs4.0 and higher version
     |-- transcode #
