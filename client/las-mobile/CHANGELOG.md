@@ -9,3 +9,4 @@
 ### Features
 
 * **ijklas:** add the ijklas demuxer into ijkplayer to support the multi-bitrate ([91a6280](https://github.com/bupt-steven/ijkplayer/commit/91a62800e39f0847a837006597da964acf47c999))
+
