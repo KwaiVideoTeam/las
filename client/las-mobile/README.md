@@ -13,17 +13,9 @@ las-mobile是一个支持LAS标准的Demuxer。las-mobile基于ff_live_flv_demux
 ## 最新改动
 - [CHANGELOG.md](CHANGELOG.md)
 
-## 快速入门
-
-docs/GettingStarted.md
-
-docs/API.md
-
 ## Demo
 
 https://github.com/bilibili/ijkplayer/tree/764da1e
-
-ijkmedia/ijkplayer/ijkavformat/ijklas.c
 
 ## 运行LAS移动端
 
