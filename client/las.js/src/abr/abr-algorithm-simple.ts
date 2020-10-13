@@ -1,8 +1,8 @@
 /*
- * @Author: wuwenjun 
- * @Date: 2020-06-09 11:54:34 
- * @Last Modified by:   wuwenjun 
- * @Last Modified time: 2020-06-09 11:54:34 
+ * @Author: wuwenjun
+ * @Date: 2020-06-09 11:54:34
+ * @Last Modified by:   wuwenjun
+ * @Last Modified time: 2020-06-09 11:54:34
  * 自适应算法
  */
 import { EventEmitter } from 'events';
@@ -45,7 +45,7 @@ const CONFIG: AdaptiveConfig = {
 };
 
 /**
- * HLS自适应码率算法入口
+ * 自适应码率算法入口
  */
 class AbrAlgorithmSimple extends EventEmitter implements IAbrAlgorithm {
     private _conf!: AdaptiveConfig;
