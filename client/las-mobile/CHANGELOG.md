@@ -1,3 +1,11 @@
+#  (2020-11-05)
+
+### Features
+
+* **las:** support video_tool_box by adding side data ([be38007](https://github.com/bupt-steven/ijkplayer/commit/be38007b411050f1d94b5e403d932692428feded))
+
+
+
 #  (2020-10-23)
 
 
