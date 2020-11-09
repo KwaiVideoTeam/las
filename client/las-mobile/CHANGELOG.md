@@ -1,3 +1,14 @@
+#  (2020-11-09)
+
+### Features
+
+* **las:** support media_codec when repeatSps is false ([0c021a4](https://github.com/bupt-steven/ijkplayer/commit/0c021a49e8411c26390fe05f7edff026fad9e454))
+
+### Bug Fixes
+
+* **init-ios:** fix the ffmpeg version in ios/android build scripts ([2692ed9](https://github.com/bupt-steven/ijkplayer/commit/2692ed95318e5379f5c4edb002f1d30260910487))
+
+
 #  (2020-11-05)
 
 ### Features
