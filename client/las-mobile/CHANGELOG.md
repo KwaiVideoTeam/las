@@ -1,3 +1,21 @@
+#  (2021-04-26)
+
+
+### Bug Fixes
+
+* **config:** move enable ijk* to the back of disable all ([a89d810](https://github.com/bupt-steven/ijkplayer/commit/a89d81043e27ab3cfca4e73712cadf8d4121ac2a))
+* **demuxer:** register ijk's custom demuxers ([d777758](https://github.com/bupt-steven/ijkplayer/commit/d77775826a7a8a9c6c5138af2958f607f29da7e2))
+* **las:** change default resolution to the middle ([a6e5146](https://github.com/bupt-steven/ijkplayer/commit/a6e514686d607fcff9cb16d627d8013b34e771d0))
+* **las:** skip switching when past buffer is empty ([82aed1a](https://github.com/bupt-steven/ijkplayer/commit/82aed1a598f3d0d1a34854426dc52d478415e58a))
+
+
+### Features
+
+* **las:** register ijklas demuxer & find through it's format_name ([13f03e8](https://github.com/bupt-steven/ijkplayer/commit/13f03e86cd4002ee958469300054422c4842ac21))
+* **las_ios:** register ijklas_demuxer through url or format_name ([b9dd6f6](https://github.com/bupt-steven/ijkplayer/commit/b9dd6f642d8acfbd344d74869a9a9535e48b25bb))
+
+
+
 #  (2020-12-08)
 
 ### Bug Fixes
