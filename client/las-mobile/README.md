@@ -15,7 +15,7 @@ las-mobile是一个支持LAS标准的Demuxer。las-mobile基于ff_live_flv_demux
 
 ## Demo
 
-https://github.com/bilibili/ijkplayer/tree/764da1e
+https://github.com/bilibili/ijkplayer/tree/master
 
 ## 运行LAS移动端
 
@@ -24,7 +24,6 @@ https://github.com/bilibili/ijkplayer/tree/764da1e
 ```
 git clone https://github.com/Bilibili/ijkplayer.git ijkplayer
 cd ijkplayer
-git checkout -B latest 764da1e
 ```
 
 安装并使用Android：
@@ -44,7 +43,7 @@ cd ..
 # 选择 android/ijkplayer/ and import
 # Run 'ijkplayer-sample'
 
-# 在手机端打开ijkmediademo
+# 在手机端打开 ijkmediademo
 # 导航栏中点击 "Sample"
 # 点击 "las test"，开始播放
 ```
@@ -62,7 +61,7 @@ cd ios
 # 依次点击 File、Open 打开 ios/IJKMediaDemo/IJKMediaDemo.xcodeproj
 
 # 点击 Run
-# 在手机端打开ijkmediademo
+# 在手机端打开 ijkmediademo
 # 点击 "Sample" 按钮
 # 点击 "las url"，开始播放
 ```
