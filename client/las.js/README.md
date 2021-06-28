@@ -56,7 +56,7 @@ las.js需要在支持MSE及fetch的浏览器上运行
 - chrome >= 42
 - firefox >= 42
 - safari >= 10.1
-- edge >=14
+- edge >= 14
 
 ### Server-side-rendering (SSR)
 
