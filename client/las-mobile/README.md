@@ -8,7 +8,7 @@ las-mobile是一个支持LAS标准的Demuxer。las-mobile基于ff_live_flv_demux
 2) 用于读取单个数据包的av_read_frame()
 3) 以及最终进行清除的avformat_close_input()。
 
-具体实现细节参考 [ijklac.c](https://github.com/bilibili/ijkplayer/blob/master/ijkmedia/ijkplayer/ijkavformat/ijklas.c)
+具体实现细节参考 [ijklas.c](https://github.com/bilibili/ijkplayer/blob/master/ijkmedia/ijkplayer/ijkavformat/ijklas.c)
 
 ## 最新改动
 - [CHANGELOG.md](CHANGELOG.md)
